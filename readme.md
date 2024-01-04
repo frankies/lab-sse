@@ -44,3 +44,8 @@ curl --location --request POST 'http://localhost:8080/api/v1/live-scores' \
     "awayScore": 1
 }' 
 ```
+
+
+### 防止页面echarts 出现内存溢出问题
+
+[https://juejin.cn/post/6933444312827068429](https://juejin.cn/post/6933444312827068429)
