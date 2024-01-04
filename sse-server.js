@@ -8,7 +8,7 @@ const process = require('process')
 const ROOT_DIR = process.cwd()
 
 const server = http.createServer(async (req, resp) => {
-    console.log("req.url=" + req.url)
+    // console.log("req.url=" + req.url)
     var fileName = "." + req.url; 
     if(req.url == '/') {
         resp.writeHead(301, {'Location': './index.html'});
@@ -16,24 +16,10 @@ const server = http.createServer(async (req, resp) => {
         return;
     }
     if (fileName === "./stream") {
-      resp.writeHead(200, {
-        "Content-Type":"text/event-stream",
-        "Cache-Control":"no-cache",
-        "Connection":"keep-alive",
-        "Access-Control-Allow-Origin": '*',
-      });
-      resp.write("retry: 10000\n");
-      resp.write("event: connecttime\n");
-      resp.write("data: " + (new Date()) + "\n\n");
-      resp.write("data: " + (new Date()) + "\n\n");
-  
-      interval = setInterval(function () {
-        resp.write("data: " + (new Date()) + "\n\n");
-      }, 1000);
-  
-      req.connection.addListener("close", function () {
-        clearInterval(interval);
-      }, false);
+      handleStream(resp, req)
+      return;
+    }else if (fileName === "./beijing_stream") {
+      handleBeijingStream(resp, req)
       return;
     }
 
@@ -72,11 +58,27 @@ server.listen(port, () => {
   console.log('server is up and running, listening port: ' + port)
 })
 
+const mimeTypes = {
+  "application/javascript": ['js'], 
+  "text/html": ['html', 'htm'],
+  "text/css": ['css'],
+  "application/json": ['json'],
+}
 
 const sendFile = async (resp, pathname) => {
     // 使用promise-style的readFile API异步读取文件的数据，然后返回给客户端
     const data = await fs.promises.readFile(pathname) 
-    resp.setHeader('Content-type', 'text/html')
+ 
+    const suffix = pathname.split(".").pop();
+    var contentType = ""
+    for(var type in mimeTypes) {
+      if(mimeTypes[type].indexOf(suffix) > -1) {
+        contentType = type
+      }
+    }
+    if(contentType) {
+      resp.setHeader('Content-type', contentType) 
+    }
     resp.end(data)
   }
 
@@ -112,4 +114,69 @@ const sendFile = async (resp, pathname) => {
     content += '</ul>'
     // 返回当前的目录结构给客户端
     resp.end(`<h1>Content of ${relativePath || 'root directory'}:</h1>${content}`)
+  }
+
+
+  function handleStream(resp, req) {
+    resp.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Access-Control-Allow-Origin": '*',
+    })
+    resp.write("retry: 10000\n")
+    resp.write("event: connecttime\n")
+    resp.write("data: " + (new Date()) + "\n\n") 
+
+    interval = setInterval(function () {
+      resp.write("data: " + (new Date()) + "\n\n")
+    }, 5000)
+
+    req.connection.addListener("close", function () {
+      clearInterval(interval)
+    }, false)
+  }
+
+
+  const startDate = new Date(2000, 1, 1);  
+  const fmtDate = (date) => {
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份需要加 1，然后用 padStart 方法补零
+    var day = date.getDate().toString().padStart(2, '0'); // 获取日期，然后用 padStart 方法补零
+    
+    // 格式化日期
+    return year + '-' + month + '-' + day;
+  }
+
+  const nextDate= (date) => { 
+     date.setDate(date.getDate() + 1);
+     return date
+  }
+
+
+  function handleBeijingStream(resp, req) {
+    resp.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Access-Control-Allow-Origin": '*',
+    })
+    resp.write("retry: 10000\n")
+    resp.write("event: connecttime\n")
+    prepareData(resp)
+
+    interval = setInterval(function () {
+      prepareData(resp)
+    }, 3000)
+
+    req.connection.addListener("close", function () {
+      clearInterval(interval)
+    }, false)
+  }
+
+
+  function prepareData(resp) {
+    resp.write("data: " + JSON.stringify([fmtDate(startDate), Math.floor(Math.random() * 600)]) + "\n\n")
+    console.log("Current date - ", startDate)
+    nextDate(startDate)
   }

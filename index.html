@@ -3,75 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sse</title>
-    <style type="text/css">
-      /* div:nth-child(even) {
-        background-color: rgba(151, 138, 138, 0.887);
-      }
-      
-       div:nth-child(odd) {
-        background-color: rgb(44, 212, 209);
-      } */
-
-
-        div:nth-child(3n+1){background:rgb(189, 171, 171);}
-
-        div:nth-child(3n+5){background:rgb(149, 149, 185);}
-
-        div:nth-child(5n-1){background:rgb(216, 216, 101);}
-
-        div:nth-child(3n±0){background:rgb(103, 176, 103);}
-
-        div:nth-child(±0n+3){background:rgb(197, 151, 67);}
-    </style>
+    <title>Document</title>
 </head>
 <body>
-
-    <div id="message"></div>
-    
-<script type="text/javascript">
-if ('EventSource' in window) {
-  
-    const addMessage = (msg, warn) => {
-        const m = document.getElementById('message')
-        const newNode = document.createElement("div");
-        newNode.innerText = msg 
-        if(warn) {
-            newNode.style = "warn"
-        }
-        m.insertBefore(newNode, m.firstElementChild)
-    }
-    // var source = new EventSource(url);
-    const url = './stream'
-    var source = new EventSource(url, { withCredentials: true });
-    source.addEventListener('message', function (event) {
-        var data = event.data;
-        // handle message
-        console.log("Receive data: ", data)
-        addMessage(data)
-    }, false);
-
-    
-    source.addEventListener('open', function (event) {
-        console.log('Sse open: ' + event);  
-        addMessage('Connection is open')
-    }, false);
-
-    source.addEventListener('error', function (event) {
-        console.error('Error: ' + event);
-        document.getElementById('message').append("<div class='warn'>Error</div>")
-        
-        addMessage('Error ' + event, true)
-    }, false);
-
-    
-    source.addEventListener('foo', function (event) {
-    var data = event.data;
-    // handle message
-    }, false);
-
-}
-</script>
-
+    <ul>
+          <li><a href="sse.html">Sse Sample</a></li> 
+          <li><a href="sse-echarts-beijin.html">Sse & Echarts Sample</a></li>
+          <li><a href="echarts-simple.html">Easy Echarts Sample</a></li>
+          <li><a href="echarts-line.html">Echarts Line Sample</a></li>
+    </ul>
 </body>
 </html>
